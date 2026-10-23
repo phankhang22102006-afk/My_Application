@@ -36,101 +36,115 @@ public class CompassDialView extends View {
         c.drawText(text, x, y, paint);
     }
 
+
+    private float sp(float value) {
+        return value * getResources().getDisplayMetrics().scaledDensity;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         float cx = getWidth() / 2f;
         float cy = getHeight() / 2f;
-        float radius = Math.min(cx, cy) * 0.78f;
+
+        float radius = Math.min(
+                getWidth() * 0.46f,
+                getHeight() * 0.43f
+        );
 
         canvas.save();
         canvas.translate(cx, cy);
 
         // Vong ngoai
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2f);
+        paint.setStrokeWidth(3f);
         paint.setColor(Color.WHITE);
         canvas.drawCircle(0, 0, radius, paint);
 
-        // Xoay mat la ban theo huong dien thoai
+        // Xoay mat la ban
         canvas.save();
         canvas.rotate(-heading);
 
+        // Vach chia do
         for (int degree = 0; degree < 360; degree += 3) {
             canvas.save();
             canvas.rotate(degree);
 
             float start;
-            float end;
+            float width;
 
             if (degree % 30 == 0) {
-                start = radius - 23;
-                end = radius;
-                paint.setStrokeWidth(2.5f);
+                start = radius - 30;
+                width = 3.5f;
             } else if (degree % 15 == 0) {
-                start = radius - 16;
-                end = radius;
-                paint.setStrokeWidth(1.8f);
+                start = radius - 22;
+                width = 2.5f;
             } else {
-                start = radius - 9;
-                end = radius;
-                paint.setStrokeWidth(1f);
+                start = radius - 13;
+                width = 1.5f;
             }
 
             paint.setColor(Color.WHITE);
-            canvas.drawLine(0, -start, 0, -end, paint);
+            paint.setStrokeWidth(width);
+            canvas.drawLine(0, -start, 0, -radius, paint);
+
             canvas.restore();
         }
 
-        // Cac moc goc
+        // So goc lon hon
         for (int degree = 0; degree < 360; degree += 30) {
             canvas.save();
             canvas.rotate(degree);
 
             drawText(canvas, String.valueOf(degree),
-                    0, -radius - 12, 13,
+                    0, -radius - 24, 32,
                     Color.LTGRAY, Paint.Align.CENTER);
 
             canvas.restore();
         }
 
-        // Bon huong
-        drawText(canvas, "B", 0, -radius + 52,
-                25, Color.RED, Paint.Align.CENTER);
+        // Bon huong lon va ro
 
-        drawText(canvas, "N", 0, radius - 30,
-                23, Color.WHITE, Paint.Align.CENTER);
+        // Bon huong that lon
+        drawText(canvas, "B", 0, -radius + 85,
+                sp(30), Color.RED, Paint.Align.CENTER);
 
-        drawText(canvas, "T", -radius + 30, 8,
-                23, Color.WHITE, Paint.Align.CENTER);
+        drawText(canvas, "N", 0, radius - 50,
+                sp(30), Color.WHITE, Paint.Align.CENTER);
 
-        drawText(canvas, "Đ", radius - 30, 8,
-                23, Color.WHITE, Paint.Align.CENTER);
+        drawText(canvas, "T", -radius + 55, 15,
+                sp(30), Color.WHITE, Paint.Align.CENTER);
+
+        drawText(canvas, "Đ", radius - 55, 15,
+                sp(30), Color.WHITE, Paint.Align.CENTER);
 
         canvas.restore();
 
         // Tam la ban
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.rgb(35, 35, 35));
-        canvas.drawCircle(0, 0, radius * 0.30f, paint);
+        canvas.drawCircle(0, 0, radius * 0.25f, paint);
 
+        // Duong tam
         paint.setColor(Color.GRAY);
-        paint.setStrokeWidth(1f);
+        paint.setStrokeWidth(1.5f);
+
         canvas.drawLine(-radius * 0.5f, 0,
                 radius * 0.5f, 0, paint);
+
         canvas.drawLine(0, -radius * 0.5f,
                 0, radius * 0.5f, paint);
 
         canvas.restore();
 
-        // Mui ten do co dinh o phia tren
-        float tipY = cy - radius - 5;
+        // Mui ten do co dinh
+        float tipY = cy - radius - 3;
 
         Path arrow = new Path();
         arrow.moveTo(cx, tipY);
-        arrow.lineTo(cx - 10, tipY + 24);
-        arrow.lineTo(cx + 10, tipY + 24);
+        arrow.lineTo(cx - 14, tipY + 30);
+        arrow.lineTo(cx + 14, tipY + 30);
         arrow.close();
 
         paint.setColor(Color.RED);

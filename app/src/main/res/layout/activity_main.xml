@@ -23,10 +23,13 @@
         android:layout_weight="1"
         android:gravity="center">
 
+
         <com.example.myapplication.CompassDialView
             android:id="@+id/compassDial"
             android:layout_width="match_parent"
-            android:layout_height="340dp" />
+            android:layout_height="match_parent" />
+
+
 
     </FrameLayout>
 
@@ -45,7 +48,7 @@
             android:layout_height="wrap_content"
             android:text="0°"
             android:textColor="#FFFFFF"
-            android:textSize="64sp"
+            android:textSize="88sp"
             android:fontFamily="sans-serif-thin" />
 
         <LinearLayout
@@ -60,14 +63,14 @@
                 android:layout_height="wrap_content"
                 android:text="Hướng Bắc"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Bắc từ"
                 android:textColor="#AAAAAA"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
     </LinearLayout>
