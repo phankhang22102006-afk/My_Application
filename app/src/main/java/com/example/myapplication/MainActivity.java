@@ -6,10 +6,10 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.widget.ImageView;
+import android.view.Surface;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.Surface;
+
 import java.util.Locale;
 
 public class MainActivity extends Activity
@@ -33,6 +33,14 @@ public class MainActivity extends Activity
     private float[] gocHuong = new float[3];
     private float[] maTranXoayTam = new float[9];
 
+    private float gocLamMuot = Float.NaN;
+    private float gocLocTruoc = Float.NaN;
+    private int gocHienThiCu = -1;
+
+    private static final float HE_SO_LAM_MUOT = 0.12f;
+    private static final float NGUONG_DAO_DONG = 1.5f;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +49,7 @@ public class MainActivity extends Activity
         compassDial = findViewById(R.id.compassDial);
         tvGoc = findViewById(R.id.tvGoc);
         tvHuong = findViewById(R.id.tvHuong);
+
         sensorManager = (SensorManager)
                 getSystemService(SENSOR_SERVICE);
 
@@ -65,35 +74,34 @@ public class MainActivity extends Activity
             sensorManager.registerListener(
                     this,
                     camBienGiaToc,
-                    SensorManager.SENSOR_DELAY_UI);
+                    SensorManager.SENSOR_DELAY_GAME);
         }
 
         if (camBienTuTruong != null) {
             sensorManager.registerListener(
                     this,
                     camBienTuTruong,
-                    SensorManager.SENSOR_DELAY_UI);
+                    SensorManager.SENSOR_DELAY_GAME);
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        sensorManager.unregisterListener(this);
+
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
+        }
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if (event.sensor.getType()
-                == Sensor.TYPE_ACCELEROMETER) {
-
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             giaToc = event.values.clone();
             coGiaToc = true;
 
-        } else if (event.sensor.getType()
-                == Sensor.TYPE_MAGNETIC_FIELD) {
-
+        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             tuTruong = event.values.clone();
             coTuTruong = true;
         }
@@ -160,19 +168,43 @@ public class MainActivity extends Activity
         float goc = (float) Math.toDegrees(gocHuong[0]);
         goc = (goc % 360 + 360) % 360;
 
-        int gocHienThi = Math.round(goc) % 360;
+        // Khởi tạo góc lần đầu
+        if (Float.isNaN(gocLamMuot)) {
+            gocLamMuot = goc;
+            gocLocTruoc = goc;
+        } else {
+            // Tính độ lệch ngắn nhất qua 0/360
+            float chenhLech =
+                    ((goc - gocLamMuot + 540) % 360) - 180;
 
-        compassDial.setHeading(goc);
+            // Lọc dao động nhỏ quanh góc hiện tại
+            if (Math.abs(chenhLech) < NGUONG_DAO_DONG) {
+                goc = gocLamMuot;
+            }
 
-        tvGoc.setText(String.format(
-                java.util.Locale.getDefault(),
-                "%d°",
-                gocHienThi));
+            // Làm mượt chuyển động
+            chenhLech = ((goc - gocLamMuot + 540) % 360) - 180;
 
-        tvHuong.setText(layTenHuong(gocHienThi));
+            gocLamMuot = (gocLamMuot
+                    + chenhLech * HE_SO_LAM_MUOT + 360) % 360;
+        }
 
+// Cập nhật mặt la bàn
+        compassDial.setHeading(gocLamMuot);
 
+        // Chỉ cập nhật số khi góc nguyên thay đổi
+        int gocHienThi = Math.round(gocLamMuot) % 360;
 
+        if (gocHienThi != gocHienThiCu) {
+            gocHienThiCu = gocHienThi;
+
+            tvGoc.setText(String.format(
+                    Locale.getDefault(),
+                    "%d°",
+                    gocHienThi));
+
+            tvHuong.setText(layTenHuong(gocHienThi));
+        }
     }
 
     private String layTenHuong(int goc) {
@@ -198,6 +230,6 @@ public class MainActivity extends Activity
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Khong can xu ly them trong ban co ban
+        // Không cần xử lý thêm trong bản cơ bản
     }
 }
