@@ -18,28 +18,30 @@ public class MainActivity extends Activity
     private SensorManager sensorManager;
     private Sensor camBienGiaToc;
     private Sensor camBienTuTruong;
+    private Sensor camBienXoay;
 
     private CompassDialView compassDial;
     private TextView tvGoc;
     private TextView tvHuong;
 
-    private float[] giaToc = new float[3];
-    private float[] tuTruong = new float[3];
+    private final float[] giaToc = new float[3];
+    private final float[] tuTruong = new float[3];
 
     private boolean coGiaToc = false;
     private boolean coTuTruong = false;
 
-    private float[] maTranXoay = new float[9];
-    private float[] gocHuong = new float[3];
-    private float[] maTranXoayTam = new float[9];
+    private final float[] maTranXoay = new float[9];
+    private final float[] gocHuong = new float[3];
+    private final float[] maTranXoayTam = new float[9];
 
     private float gocLamMuot = Float.NaN;
-    private float gocLocTruoc = Float.NaN;
     private int gocHienThiCu = -1;
 
-    private static final float HE_SO_LAM_MUOT = 0.12f;
-    private static final float NGUONG_DAO_DONG = 1.5f;
+    // Tang he so de kim bam theo nhanh hon.
+    private static final float HE_SO_LAM_MUOT = 0.22f;
 
+    // Bo qua dao dong rat nho cua cam bien.
+    private static final float NGUONG_DAO_DONG = 0.8f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +62,11 @@ public class MainActivity extends Activity
                 Sensor.TYPE_MAGNETIC_FIELD);
 
         if (camBienGiaToc == null || camBienTuTruong == null) {
-            Toast.makeText(this,
+            Toast.makeText(
+                    this,
                     "Điện thoại không có đủ cảm biến la bàn",
-                    Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG
+            ).show();
         }
     }
 
@@ -98,11 +102,20 @@ public class MainActivity extends Activity
     public void onSensorChanged(SensorEvent event) {
 
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            giaToc = event.values.clone();
+            // Loc nhe du lieu de giam nhieu.
+            for (int i = 0; i < 3; i++) {
+                giaToc[i] = giaToc[i] * 0.75f
+                        + event.values[i] * 0.25f;
+            }
             coGiaToc = true;
 
-        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            tuTruong = event.values.clone();
+        } else if (event.sensor.getType()
+                == Sensor.TYPE_MAGNETIC_FIELD) {
+
+            for (int i = 0; i < 3; i++) {
+                tuTruong[i] = tuTruong[i] * 0.75f
+                        + event.values[i] * 0.25f;
+            }
             coTuTruong = true;
         }
 
@@ -123,7 +136,7 @@ public class MainActivity extends Activity
         int manHinh = getWindowManager()
                 .getDefaultDisplay().getRotation();
 
-        boolean remapThanhCong = false;
+        boolean remapThanhCong;
 
         switch (manHinh) {
             case Surface.ROTATION_90:
@@ -168,31 +181,30 @@ public class MainActivity extends Activity
         float goc = (float) Math.toDegrees(gocHuong[0]);
         goc = (goc % 360 + 360) % 360;
 
-        // Khởi tạo góc lần đầu
         if (Float.isNaN(gocLamMuot)) {
             gocLamMuot = goc;
-            gocLocTruoc = goc;
         } else {
-            // Tính độ lệch ngắn nhất qua 0/360
+            // Tinh do lech ngan nhat qua moc 0/360.
             float chenhLech =
-                    ((goc - gocLamMuot + 540) % 360) - 180;
+                    ((goc - gocLamMuot + 540f) % 360f) - 180f;
 
-            // Lọc dao động nhỏ quanh góc hiện tại
+            // Bo qua dao dong nho.
             if (Math.abs(chenhLech) < NGUONG_DAO_DONG) {
                 goc = gocLamMuot;
             }
 
-            // Làm mượt chuyển động
-            chenhLech = ((goc - gocLamMuot + 540) % 360) - 180;
+            chenhLech =
+                    ((goc - gocLamMuot + 540f) % 360f) - 180f;
 
+            // Lam muot goc.
             gocLamMuot = (gocLamMuot
-                    + chenhLech * HE_SO_LAM_MUOT + 360) % 360;
+                    + chenhLech * HE_SO_LAM_MUOT + 360f) % 360f;
         }
 
-// Cập nhật mặt la bàn
+        // Cap nhat mat la ban bang ham cua code goc.
         compassDial.setHeading(gocLamMuot);
 
-        // Chỉ cập nhật số khi góc nguyên thay đổi
+        // Chi cap nhat giao dien khi so do nguyen thay doi.
         int gocHienThi = Math.round(gocLamMuot) % 360;
 
         if (gocHienThi != gocHienThiCu) {
@@ -230,6 +242,6 @@ public class MainActivity extends Activity
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Không cần xử lý thêm trong bản cơ bản
+        // Khong can xu ly them trong ban co ban.
     }
 }
