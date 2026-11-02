@@ -5,9 +5,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
-import android.graphics.Typeface;
 
 public class CompassDialView extends View {
 
@@ -15,6 +15,9 @@ public class CompassDialView extends View {
             new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private float heading = 0f;
+
+    // Góc hướng đã lưu
+    private float savedHeading = Float.NaN;
 
     public CompassDialView(Context context) {
         super(context);
@@ -26,6 +29,18 @@ public class CompassDialView extends View {
 
     public void setHeading(float degrees) {
         heading = (degrees % 360f + 360f) % 360f;
+        invalidate();
+    }
+
+    // Đặt hướng đã lưu để vẽ dấu xanh
+    public void setSavedHeading(float degrees) {
+        savedHeading = (degrees % 360f + 360f) % 360f;
+        invalidate();
+    }
+
+    // Xóa dấu hướng đã lưu
+    public void clearSavedHeading() {
+        savedHeading = Float.NaN;
         invalidate();
     }
 
@@ -60,13 +75,13 @@ public class CompassDialView extends View {
         canvas.save();
         canvas.translate(cx, cy);
 
-        // Vong tron ben ngoai
+        // Vòng tròn bên ngoài
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(2.5f);
         canvas.drawCircle(0, 0, radius, paint);
 
-        // Cac vach chia do xoay theo huong dien thoai
+        // Các vạch chia độ xoay theo hướng điện thoại
         canvas.save();
         canvas.rotate(-heading);
 
@@ -90,17 +105,54 @@ public class CompassDialView extends View {
 
             canvas.save();
             canvas.rotate(degree);
+
             canvas.drawLine(
                     0, -start,
                     0, -radius,
                     paint
             );
+
             canvas.restore();
         }
 
         canvas.restore();
 
-        // So do lon, giu chu dung de doc de hon
+        // Dấu xanh đánh dấu hướng đã lưu
+        if (!Float.isNaN(savedHeading)) {
+
+            canvas.save();
+
+            // Đặt dấu theo hướng đã lưu so với hướng hiện tại
+            canvas.rotate(savedHeading - heading);
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.rgb(0, 200, 255));
+            paint.setStrokeWidth(6f);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+
+            // Vạch đánh dấu trên vòng la bàn
+            canvas.drawLine(
+                    0,
+                    -radius * 0.78f,
+                    0,
+                    -radius * 0.99f,
+                    paint
+            );
+
+            // Chấm tròn ở đầu trong của dấu
+            paint.setStyle(Paint.Style.FILL);
+
+            canvas.drawCircle(
+                    0,
+                    -radius * 0.78f,
+                    7f,
+                    paint
+            );
+
+            canvas.restore();
+        }
+
+        // Số độ luôn giữ đúng chiều đọc
         float soRadius = radius * 0.79f;
         float soSize = radius * 0.085f;
 
@@ -113,49 +165,54 @@ public class CompassDialView extends View {
             drawText(
                     canvas,
                     String.valueOf(degree),
-                    x, y + soSize * 0.35f,
+                    x,
+                    y + soSize * 0.35f,
                     soSize,
                     Color.LTGRAY
             );
         }
 
-        // Bon huong lon, ro
+        // Bốn hướng lớn
         float huongRadius = radius * 0.61f;
         float chuSize = radius * 0.19f;
 
         veChuHuong(canvas, "B", 0, huongRadius,
                 chuSize, Color.RED);
+
         veChuHuong(canvas, "Đ", 90, huongRadius,
                 chuSize, Color.WHITE);
+
         veChuHuong(canvas, "N", 180, huongRadius,
                 chuSize, Color.WHITE);
+
         veChuHuong(canvas, "T", 270, huongRadius,
                 chuSize, Color.WHITE);
 
-        // Tam la ban
+        // Tâm la bàn
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.rgb(38, 38, 38));
         canvas.drawCircle(0, 0, radius * 0.16f, paint);
 
-        // Duong tam
+        // Đường tâm
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.rgb(95, 95, 95));
         paint.setStrokeWidth(1.5f);
 
         canvas.drawLine(
                 -radius * 0.45f, 0,
-                radius * 0.45f, 0, paint
+                radius * 0.45f, 0,
+                paint
         );
 
         canvas.drawLine(
                 0, -radius * 0.45f,
-                0, radius * 0.45f, paint
+                0, radius * 0.45f,
+                paint
         );
 
         canvas.restore();
 
-        // Mui ten do co dinh phia tren
-        // Mui ten do lon va ro hon
+        // Mũi tên đỏ cố định phía trên
         float tipY = cy - radius - 2f;
 
         Path arrow = new Path();

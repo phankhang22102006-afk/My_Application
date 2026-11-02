@@ -8,7 +8,7 @@
     android:paddingStart="18dp"
     android:paddingEnd="18dp"
     android:paddingTop="24dp"
-    android:paddingBottom="48dp">
+    android:paddingBottom="32dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -16,6 +16,7 @@
         android:text="COMPASS"
         android:textColor="#FFFFFF"
         android:textSize="25sp"
+        android:layout_marginTop="20dp"
         android:textStyle="bold"
         android:gravity="center"
         android:includeFontPadding="false" />
@@ -28,7 +29,7 @@
         android:textSize="12sp"
         android:letterSpacing="0.15"
         android:gravity="center"
-        android:layout_marginTop="6dp" />
+        android:layout_marginTop="15dp" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -116,14 +117,74 @@
 
     </LinearLayout>
 
+    <!-- Trạng thái cảm biến -->
+    <TextView
+        android:id="@+id/tvAccuracy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Độ chính xác: Đang chờ cảm biến"
+        android:textColor="#8E8E93"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:layout_marginTop="12dp" />
+
+    <!-- Hướng đã lưu -->
+    <TextView
+        android:id="@+id/tvSaved"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hướng đã lưu: Chưa có"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:gravity="center"
+        android:layout_marginTop="7dp" />
+
+    <!-- Hai nút chức năng -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="12dp">
+
+        <Button
+            android:id="@+id/btnSaveHeading"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Lưu hướng"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#2C2C2E" />
+
+        <Button
+            android:id="@+id/btnCalibration"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:text="Hiệu chuẩn"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#2C2C2E" />
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/btnCancelHeading"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:text="Hủy hướng đã lưu"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#2C2C2E" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Xoay điện thoại để xác định phương hướng"
         android:textColor="#8E8E93"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginTop="5dp" />
 
 </LinearLayout>
