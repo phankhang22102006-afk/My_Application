@@ -1,112 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#101820"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="#F4F6FA"
     android:padding="24dp">
 
     <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="SHAKE DETECTION"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
+        android:text="SHAKE DETECTOR"
+        android:textSize="25sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="HardcodedText" />
+        android:textColor="#263A60"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="30dp"/>
 
     <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="Ứng dụng phát hiện lắc bằng cảm biến gia tốc"
-        android:textColor="#B8C7D9"
-        android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="HardcodedText" />
-
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:background="#1F3545"
-        android:gravity="center"
-        android:padding="18dp"
-        android:text="Đang chờ lắc..."
-        android:textColor="#6EE7B7"
-        android:textSize="20sp"
+        android:text="SỐ LẦN LẮC"
+        android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="HardcodedText" />
-
-    <TextView
-        android:id="@+id/tvCountLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:text="SỐ LẦN PHÁT HIỆN"
-        android:textColor="#B8C7D9"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/tvStatus"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="HardcodedText" />
+        android:textColor="#777777"
+        android:gravity="center"/>
 
     <TextView
         android:id="@+id/tvCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
         android:text="0"
-        android:textColor="#FFFFFF"
-        android:textSize="72sp"
+        android:textSize="76sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/tvCountLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="HardcodedText" />
+        android:textColor="#3F51B5"
+        android:gravity="center"/>
 
     <TextView
-        android:id="@+id/tvInstruction"
-        android:layout_width="0dp"
+        android:id="@+id/tvBest"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:text="Kỷ lục: 0"
+        android:textSize="17sp"
+        android:textColor="#E67E22"
         android:gravity="center"
-        android:lineSpacingExtra="6dp"
-        android:text="Hãy cầm điện thoại và lắc nhẹ để thử!"
-        android:textColor="#DCE6F1"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tvCount"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="HardcodedText" />
+        android:layout_marginBottom="30dp"/>
 
     <TextView
-        android:id="@+id/tvFooter"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Sử dụng Accelerometer • Android Java"
-        android:textColor="#7890A4"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="HardcodedText" />
+        android:text="CƯỜNG ĐỘ CHUYỂN ĐỘNG"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="#333333"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ProgressBar
+        android:id="@+id/progressIntensity"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#3F51B5"
+        android:progressBackgroundTint="#D5DCE8"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:id="@+id/tvIntensity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cường độ: Chưa có"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textColor="#3F51B5"
+        android:gravity="center"
+        android:layout_marginBottom="25dp"/>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chưa bắt đầu"
+        android:textSize="15sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"/>
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="Bắt đầu"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#3F51B5"/>
+
+    <Button
+        android:id="@+id/btnReset"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="Reset"
+        android:textSize="17sp"
+        android:layout_marginTop="12dp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#E67E22"/>
+
+</LinearLayout>

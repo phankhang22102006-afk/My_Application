@@ -1,67 +1,190 @@
 package com.example.myapplication;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
 
-public class MainActivity2 extends Activity implements SensorEventListener {
+public class MainActivity2 extends Activity
+        implements SensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
+    private Vibrator vibrator;
 
-    private TextView tvStatus;
     private TextView tvCount;
-    private TextView tvInstruction;
+    private TextView tvBest;
+    private TextView tvIntensity;
+    private TextView tvStatus;
+
+    private ProgressBar progressIntensity;
+
+    private Button btnStart;
+    private Button btnReset;
+
+    private SharedPreferences preferences;
 
     private int shakeCount = 0;
-    private long lastShakeTime = 0L;
-    private long lastUpdateTime = 0L;
+    private int bestRecord = 0;
 
-    private static final float SHAKE_THRESHOLD = 12.5f;
-    private static final long SHAKE_COOLDOWN_MS = 700L;
+    private boolean isRunning = false;
+    private boolean isRegistered = false;
+
+    private final float[] gravity = new float[3];
+
+    private static final float ALPHA = 0.85f;
+
+    private static final float SHAKE_THRESHOLD = 2.5f;
+
+    private static final float RESET_THRESHOLD = 1.3f;
+
+    private static final long SHAKE_INTERVAL = 400;
+
+    private boolean shakeArmed = true;
+
+    private long lastShakeTime = 0;
+
+    private float peakAcceleration = 0f;
+
+    private static final String PREF_NAME = "ShakePreferences";
+    private static final String KEY_BEST = "best_record";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        tvStatus = findViewById(R.id.tvStatus);
+        // Anh xa giao dien
         tvCount = findViewById(R.id.tvCount);
-        tvInstruction = findViewById(R.id.tvInstruction);
+        tvBest = findViewById(R.id.tvBest);
+        tvIntensity = findViewById(R.id.tvIntensity);
+        tvStatus = findViewById(R.id.tvStatus);
 
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        if (sensorManager != null) {
-            accelerometer = sensorManager.getDefaultSensor(
-                    Sensor.TYPE_ACCELEROMETER);
-        }
+        progressIntensity =
+                findViewById(R.id.progressIntensity);
+
+        btnStart = findViewById(R.id.btnStart);
+        btnReset = findViewById(R.id.btnReset);
+
+        sensorManager = (SensorManager)
+                getSystemService(Context.SENSOR_SERVICE);
+
+        accelerometer = sensorManager.getDefaultSensor(
+                Sensor.TYPE_ACCELEROMETER
+        );
+
+        vibrator = (Vibrator)
+                getSystemService(Context.VIBRATOR_SERVICE);
+        preferences = getSharedPreferences(
+                PREF_NAME,
+                MODE_PRIVATE
+        );
+
+        bestRecord = preferences.getInt(KEY_BEST, 0);
+
+        capNhatGiaoDien();
 
         if (accelerometer == null) {
-            tvStatus.setText("Thiết bị không hỗ trợ cảm biến gia tốc");
-            tvInstruction.setText("Ứng dụng này cần cảm biến Accelerometer để phát hiện lắc.");
-        } else {
-            tvStatus.setText("Sẵn sàng");
-            tvInstruction.setText("Hãy cầm điện thoại và lắc nhẹ để thử!");
+            btnStart.setEnabled(false);
+
+            tvStatus.setText(
+                    "Thiết bị không hỗ trợ Accelerometer"
+            );
+
+            Toast.makeText(
+                    this,
+                    "Không tìm thấy cảm biến gia tốc",
+                    Toast.LENGTH_LONG
+            ).show();
         }
 
-        tvCount.setText(String.valueOf(shakeCount));
+        btnStart.setOnClickListener(v -> {
+
+            if (isRunning) {
+                tamDung();
+            } else {
+                batDau();
+            }
+        });
+
+        btnReset.setOnClickListener(v -> resetBoDem());
+    }
+
+    private void batDau() {
+
+        if (accelerometer == null) {
+            return;
+        }
+
+        isRunning = true;
+
+        dangKyCamBien();
+
+        btnStart.setText("Tạm dừng");
+
+        tvStatus.setText("Đang theo dõi chuyển động");
+
+        Toast.makeText(
+                this,
+                "Bắt đầu đo chuyển động",
+                Toast.LENGTH_SHORT
+        ).show();
+    }
+
+    private void tamDung() {
+
+        isRunning = false;
+
+        huyDangKyCamBien();
+
+        btnStart.setText("Bắt đầu");
+
+        tvStatus.setText("Đã tạm dừng");
+    }
+
+    private void dangKyCamBien() {
+
+        if (!isRegistered && accelerometer != null) {
+
+            sensorManager.registerListener(
+                    this,
+                    accelerometer,
+                    SensorManager.SENSOR_DELAY_GAME
+            );
+
+            isRegistered = true;
+        }
+    }
+
+    private void huyDangKyCamBien() {
+
+        if (isRegistered) {
+
+            sensorManager.unregisterListener(this);
+
+            isRegistered = false;
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (sensorManager != null && accelerometer != null) {
-            sensorManager.registerListener(
-                    this,
-                    accelerometer,
-                    SensorManager.SENSOR_DELAY_GAME);
+        if (isRunning) {
+            dangKyCamBien();
         }
     }
 
@@ -69,46 +192,193 @@ public class MainActivity2 extends Activity implements SensorEventListener {
     protected void onPause() {
         super.onPause();
 
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this);
-        }
+        huyDangKyCamBien();
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) {
+
+        if (!isRunning) {
             return;
         }
 
-        float x = event.values[0] / SensorManager.GRAVITY_EARTH;
-        float y = event.values[1] / SensorManager.GRAVITY_EARTH;
-        float z = event.values[2] / SensorManager.GRAVITY_EARTH;
+        if (event.sensor.getType()
+                != Sensor.TYPE_ACCELEROMETER) {
+            return;
+        }
 
-        float acceleration = (float) Math.sqrt(x * x + y * y + z * z);
-        long now = SystemClock.elapsedRealtime();
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+        gravity[0] = ALPHA * gravity[0]
+                + (1 - ALPHA) * x;
 
-        // Ignore tiny movements and avoid counting the same shake several times.
-        if (acceleration > SHAKE_THRESHOLD / SensorManager.GRAVITY_EARTH
-                && now - lastShakeTime > SHAKE_COOLDOWN_MS) {
-            lastShakeTime = now;
+        gravity[1] = ALPHA * gravity[1]
+                + (1 - ALPHA) * y;
+
+        gravity[2] = ALPHA * gravity[2]
+                + (1 - ALPHA) * z;
+
+        float linearX = x - gravity[0];
+        float linearY = y - gravity[1];
+        float linearZ = z - gravity[2];
+
+        float acceleration = (float) Math.sqrt(
+                linearX * linearX
+                        + linearY * linearY
+                        + linearZ * linearZ
+        );
+
+        capNhatCuongDo(acceleration);
+
+        long currentTime = System.currentTimeMillis();
+        peakAcceleration = Math.max(
+                peakAcceleration,
+                acceleration
+        );
+
+        if (acceleration < RESET_THRESHOLD) {
+            shakeArmed = true;
+            peakAcceleration = 0f;
+        }
+
+        if (acceleration >= SHAKE_THRESHOLD
+                && shakeArmed
+                && currentTime - lastShakeTime
+                >= SHAKE_INTERVAL) {
+
+            shakeArmed = false;
+
+            lastShakeTime = currentTime;
+
             shakeCount++;
+            if (shakeCount > bestRecord) {
 
-            tvCount.setText(String.valueOf(shakeCount));
-            tvStatus.setText("Đã phát hiện lắc!");
-            tvInstruction.setText(String.format(
-                    Locale.getDefault(),
-                    "Cường độ chuyển động: %.1f m/s²\nTiếp tục lắc để tăng bộ đếm.",
-                    acceleration * SensorManager.GRAVITY_EARTH));
-        } else if (now - lastUpdateTime > 1500L
-                && now - lastShakeTime > 1500L) {
-            lastUpdateTime = now;
-            tvStatus.setText("Đang chờ lắc...");
-            tvInstruction.setText("Cầm điện thoại chắc chắn rồi lắc nhẹ.");
+                bestRecord = shakeCount;
+
+                preferences.edit()
+                        .putInt(KEY_BEST, bestRecord)
+                        .apply();
+            }
+
+            hienThiMucDo(acceleration);
+
+            phanHoiRung();
+
+            capNhatGiaoDien();
         }
     }
 
+    private void capNhatCuongDo(float acceleration) {
+
+        int progress = Math.min(
+                100,
+                Math.round(acceleration * 5f)
+        );
+
+        progressIntensity.setProgress(progress);
+
+        if (acceleration < SHAKE_THRESHOLD) {
+
+            tvIntensity.setText("Cường độ: Đang chờ");
+
+        } else {
+
+            tvIntensity.setText(String.format(
+                    Locale.getDefault(),
+                    "Cường độ: %.1f m/s²",
+                    acceleration
+            ));
+        }
+    }
+
+    private void hienThiMucDo(float acceleration) {
+
+        String mucDo;
+
+        if (acceleration < 5f) {
+
+            mucDo = "Nhẹ";
+
+        } else if (acceleration < 9f) {
+
+            mucDo = "Vừa";
+
+        } else {
+
+            mucDo = "Mạnh";
+        }
+
+        tvIntensity.setText(
+                "Mức độ lắc: " + mucDo
+        );
+    }
+
+    private void phanHoiRung() {
+
+        if (vibrator == null || !vibrator.hasVibrator()) {
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            vibrator.vibrate(
+                    VibrationEffect.createOneShot(
+                            35,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                    )
+            );
+
+        } else {
+
+            vibrator.vibrate(35);
+        }
+    }
+    private void capNhatGiaoDien() {
+
+        tvCount.setText(String.valueOf(shakeCount));
+
+        tvBest.setText(
+                "Kỷ lục: " + bestRecord
+        );
+    }
+    private void resetBoDem() {
+
+        shakeCount = 0;
+
+        shakeArmed = true;
+
+        peakAcceleration = 0f;
+
+        lastShakeTime = 0;
+
+        gravity[0] = 0f;
+        gravity[1] = 0f;
+        gravity[2] = 0f;
+
+        progressIntensity.setProgress(0);
+
+        tvIntensity.setText("Cường độ: Chưa có");
+
+        capNhatGiaoDien();
+
+        tvStatus.setText(
+                isRunning
+                        ? "Đang theo dõi chuyển động"
+                        : "Đã đặt lại bộ đếm"
+        );
+
+        Toast.makeText(
+                this,
+                "Đã đặt lại bộ đếm",
+                Toast.LENGTH_SHORT
+        ).show();
+    }
+
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // No extra handling is needed for this basic demo.
+    public void onAccuracyChanged(
+            Sensor sensor,
+            int accuracy
+    ) {
     }
 }

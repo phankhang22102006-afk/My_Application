@@ -16,32 +16,25 @@ public class MainActivity extends Activity
         implements SensorEventListener {
 
     private SensorManager sensorManager;
-    private Sensor camBienGiaToc;
-    private Sensor camBienTuTruong;
     private Sensor camBienXoay;
 
     private CompassDialView compassDial;
     private TextView tvGoc;
     private TextView tvHuong;
 
-    private final float[] giaToc = new float[3];
-    private final float[] tuTruong = new float[3];
-
-    private boolean coGiaToc = false;
-    private boolean coTuTruong = false;
-
+    private final float[] rotationVector = new float[5];
     private final float[] maTranXoay = new float[9];
-    private final float[] gocHuong = new float[3];
     private final float[] maTranXoayTam = new float[9];
+    private final float[] gocHuong = new float[3];
+
+    private boolean daCoDuLieu = false;
 
     private float gocLamMuot = Float.NaN;
     private int gocHienThiCu = -1;
 
-    // Tang he so de kim bam theo nhanh hon.
-    private static final float HE_SO_LAM_MUOT = 0.22f;
+    private static final float HE_SO_LAM_MUOT = 0.12f;
 
-    // Bo qua dao dong rat nho cua cam bien.
-    private static final float NGUONG_DAO_DONG = 0.8f;
+    private static final float NGUONG_DAO_DONG = 1.2f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,16 +48,13 @@ public class MainActivity extends Activity
         sensorManager = (SensorManager)
                 getSystemService(SENSOR_SERVICE);
 
-        camBienGiaToc = sensorManager.getDefaultSensor(
-                Sensor.TYPE_ACCELEROMETER);
+        camBienXoay = sensorManager.getDefaultSensor(
+                Sensor.TYPE_ROTATION_VECTOR);
 
-        camBienTuTruong = sensorManager.getDefaultSensor(
-                Sensor.TYPE_MAGNETIC_FIELD);
-
-        if (camBienGiaToc == null || camBienTuTruong == null) {
+        if (camBienXoay == null) {
             Toast.makeText(
                     this,
-                    "Điện thoại không có đủ cảm biến la bàn",
+                    "Điện thoại không hỗ trợ Rotation Vector",
                     Toast.LENGTH_LONG
             ).show();
         }
@@ -74,18 +64,12 @@ public class MainActivity extends Activity
     protected void onResume() {
         super.onResume();
 
-        if (camBienGiaToc != null) {
+        if (camBienXoay != null) {
             sensorManager.registerListener(
                     this,
-                    camBienGiaToc,
-                    SensorManager.SENSOR_DELAY_GAME);
-        }
-
-        if (camBienTuTruong != null) {
-            sensorManager.registerListener(
-                    this,
-                    camBienTuTruong,
-                    SensorManager.SENSOR_DELAY_GAME);
+                    camBienXoay,
+                    SensorManager.SENSOR_DELAY_GAME
+            );
         }
     }
 
@@ -101,121 +85,112 @@ public class MainActivity extends Activity
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            // Loc nhe du lieu de giam nhieu.
-            for (int i = 0; i < 3; i++) {
-                giaToc[i] = giaToc[i] * 0.75f
-                        + event.values[i] * 0.25f;
-            }
-            coGiaToc = true;
-
-        } else if (event.sensor.getType()
-                == Sensor.TYPE_MAGNETIC_FIELD) {
-
-            for (int i = 0; i < 3; i++) {
-                tuTruong[i] = tuTruong[i] * 0.75f
-                        + event.values[i] * 0.25f;
-            }
-            coTuTruong = true;
-        }
-
-        if (!coGiaToc || !coTuTruong) {
+        if (event.sensor.getType()
+                != Sensor.TYPE_ROTATION_VECTOR) {
             return;
         }
 
-        boolean thanhCong = SensorManager.getRotationMatrix(
+        System.arraycopy(
+                event.values,
+                0,
+                rotationVector,
+                0,
+                Math.min(event.values.length, rotationVector.length)
+        );
+
+        SensorManager.getRotationMatrixFromVector(
                 maTranXoay,
-                null,
-                giaToc,
-                tuTruong);
+                rotationVector
+        );
+
+        int manHinh = getWindowManager()
+                .getDefaultDisplay().getRotation();
+
+        int axisX;
+        int axisY;
+
+        switch (manHinh) {
+
+            case Surface.ROTATION_90:
+                axisX = SensorManager.AXIS_Y;
+                axisY = SensorManager.AXIS_MINUS_X;
+                break;
+
+            case Surface.ROTATION_180:
+                axisX = SensorManager.AXIS_MINUS_X;
+                axisY = SensorManager.AXIS_MINUS_Y;
+                break;
+
+            case Surface.ROTATION_270:
+                axisX = SensorManager.AXIS_MINUS_Y;
+                axisY = SensorManager.AXIS_X;
+                break;
+
+            default:
+                axisX = SensorManager.AXIS_X;
+                axisY = SensorManager.AXIS_Y;
+                break;
+        }
+
+        boolean thanhCong =
+                SensorManager.remapCoordinateSystem(
+                        maTranXoay,
+                        axisX,
+                        axisY,
+                        maTranXoayTam
+                );
 
         if (!thanhCong) {
             return;
         }
 
-        int manHinh = getWindowManager()
-                .getDefaultDisplay().getRotation();
-
-        boolean remapThanhCong;
-
-        switch (manHinh) {
-            case Surface.ROTATION_90:
-                remapThanhCong = SensorManager.remapCoordinateSystem(
-                        maTranXoay,
-                        SensorManager.AXIS_Y,
-                        SensorManager.AXIS_MINUS_X,
-                        maTranXoayTam);
-                break;
-
-            case Surface.ROTATION_180:
-                remapThanhCong = SensorManager.remapCoordinateSystem(
-                        maTranXoay,
-                        SensorManager.AXIS_MINUS_X,
-                        SensorManager.AXIS_MINUS_Y,
-                        maTranXoayTam);
-                break;
-
-            case Surface.ROTATION_270:
-                remapThanhCong = SensorManager.remapCoordinateSystem(
-                        maTranXoay,
-                        SensorManager.AXIS_MINUS_Y,
-                        SensorManager.AXIS_X,
-                        maTranXoayTam);
-                break;
-
-            default:
-                System.arraycopy(
-                        maTranXoay, 0,
-                        maTranXoayTam, 0,
-                        maTranXoay.length);
-                remapThanhCong = true;
-                break;
-        }
-
-        if (!remapThanhCong) {
-            return;
-        }
-
-        SensorManager.getOrientation(maTranXoayTam, gocHuong);
+        SensorManager.getOrientation(
+                maTranXoayTam,
+                gocHuong
+        );
 
         float goc = (float) Math.toDegrees(gocHuong[0]);
-        goc = (goc % 360 + 360) % 360;
 
-        if (Float.isNaN(gocLamMuot)) {
+        goc = (goc % 360f + 360f) % 360f;
+
+        // Khoi tao gia tri lan dau
+        if (!daCoDuLieu || Float.isNaN(gocLamMuot)) {
             gocLamMuot = goc;
+            daCoDuLieu = true;
+
         } else {
-            // Tinh do lech ngan nhat qua moc 0/360.
+
             float chenhLech =
                     ((goc - gocLamMuot + 540f) % 360f) - 180f;
 
-            // Bo qua dao dong nho.
             if (Math.abs(chenhLech) < NGUONG_DAO_DONG) {
-                goc = gocLamMuot;
+                return;
             }
 
-            chenhLech =
-                    ((goc - gocLamMuot + 540f) % 360f) - 180f;
-
-            // Lam muot goc.
-            gocLamMuot = (gocLamMuot
-                    + chenhLech * HE_SO_LAM_MUOT + 360f) % 360f;
+            gocLamMuot =
+                    (gocLamMuot
+                            + chenhLech * HE_SO_LAM_MUOT
+                            + 360f) % 360f;
         }
 
-        // Cap nhat mat la ban bang ham cua code goc.
         compassDial.setHeading(gocLamMuot);
 
-        // Chi cap nhat giao dien khi so do nguyen thay doi.
-        int gocHienThi = Math.round(gocLamMuot) % 360;
+        int gocHienThi =
+                Math.round(gocLamMuot) % 360;
 
         if (gocHienThi != gocHienThiCu) {
+
             gocHienThiCu = gocHienThi;
 
             tvGoc.setText(String.format(
                     Locale.getDefault(),
                     "%d°",
-                    gocHienThi));
+                    gocHienThi
+            ));
 
-            tvHuong.setText(layTenHuong(gocHienThi));
+            tvHuong.setText(
+                    layTenHuong(gocHienThi)
+            );
         }
     }
 
@@ -241,7 +216,9 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Khong can xu ly them trong ban co ban.
+    public void onAccuracyChanged(
+            Sensor sensor,
+            int accuracy
+    ) {
     }
 }
