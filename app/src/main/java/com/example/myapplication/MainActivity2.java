@@ -61,13 +61,12 @@ public class MainActivity2 extends Activity
 
     private static final String PREF_NAME = "ShakePreferences";
     private static final String KEY_BEST = "best_record";
+    private IntensityChartView intensityChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
-        // Anh xa giao dien
         tvCount = findViewById(R.id.tvCount);
         tvBest = findViewById(R.id.tvBest);
         tvIntensity = findViewById(R.id.tvIntensity);
@@ -75,7 +74,7 @@ public class MainActivity2 extends Activity
 
         progressIntensity =
                 findViewById(R.id.progressIntensity);
-
+        intensityChart = findViewById(R.id.intensityChart);
         btnStart = findViewById(R.id.btnStart);
         btnReset = findViewById(R.id.btnReset);
 
@@ -277,6 +276,7 @@ public class MainActivity2 extends Activity
         );
 
         progressIntensity.setProgress(progress);
+        intensityChart.addValue(acceleration);
 
         if (acceleration < SHAKE_THRESHOLD) {
 
@@ -357,7 +357,7 @@ public class MainActivity2 extends Activity
         gravity[2] = 0f;
 
         progressIntensity.setProgress(0);
-
+        intensityChart.clear();
         tvIntensity.setText("Cường độ: Chưa có");
 
         capNhatGiaoDien();

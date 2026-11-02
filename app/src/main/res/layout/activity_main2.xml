@@ -1,113 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:background="#F4F6FA"
-    android:padding="24dp">
+    android:background="#F3F6FC"
+    android:fillViewport="true">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SHAKE DETECTOR"
-        android:textSize="25sp"
-        android:textStyle="bold"
-        android:textColor="#263A60"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="30dp"/>
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SỐ LẦN LẮC"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#777777"
-        android:gravity="center"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SHAKE DETECTOR"
+            android:textColor="#20345B"
+            android:textSize="23sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:layout_marginTop="8dp" />
 
-    <TextView
-        android:id="@+id/tvCount"
-        android:layout_width="match_parent"
-        android:layout_height="130dp"
-        android:text="0"
-        android:textSize="76sp"
-        android:textStyle="bold"
-        android:textColor="#3F51B5"
-        android:gravity="center"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Theo dõi chuyển động của bạn"
+            android:textColor="#8995AA"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="14dp" />
 
-    <TextView
-        android:id="@+id/tvBest"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Kỷ lục: 0"
-        android:textSize="17sp"
-        android:textColor="#E67E22"
-        android:gravity="center"
-        android:layout_marginBottom="30dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="105dp"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_shake_card"
+            android:padding="10dp"
+            android:gravity="center">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="CƯỜNG ĐỘ CHUYỂN ĐỘNG"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:textColor="#333333"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
 
-    <ProgressBar
-        android:id="@+id/progressIntensity"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="18dp"
-        android:max="100"
-        android:progress="0"
-        android:progressTint="#3F51B5"
-        android:progressBackgroundTint="#D5DCE8"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SỐ LẦN LẮC"
+                    android:textColor="#8491A8"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:includeFontPadding="false" />
 
-    <TextView
-        android:id="@+id/tvIntensity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Cường độ: Chưa có"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        android:textColor="#3F51B5"
-        android:gravity="center"
-        android:layout_marginBottom="25dp"/>
+                <TextView
+                    android:id="@+id/tvCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#3478F6"
+                    android:textSize="43sp"
+                    android:textStyle="bold"
+                    android:includeFontPadding="false" />
+            </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Chưa bắt đầu"
-        android:textSize="15sp"
-        android:textColor="#666666"
-        android:gravity="center"
-        android:layout_marginBottom="20dp"/>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="65dp"
+                android:background="#E5EAF3" />
 
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:text="Bắt đầu"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#3F51B5"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
 
-    <Button
-        android:id="@+id/btnReset"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:text="Reset"
-        android:textSize="17sp"
-        android:layout_marginTop="12dp"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#E67E22"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KỶ LỤC"
+                    android:textColor="#8491A8"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:includeFontPadding="false" />
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/tvBest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kỷ lục: 0"
+                    android:textColor="#E69A43"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:layout_marginTop="5dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_shake_card"
+            android:padding="13dp"
+            android:layout_marginTop="13dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="BIỂU ĐỒ CƯỜNG ĐỘ"
+                android:textColor="#20345B"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:includeFontPadding="false" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gia tốc theo thời gian thực"
+                android:textColor="#929DB0"
+                android:textSize="12sp"
+                android:includeFontPadding="false"
+                android:layout_marginTop="4dp" />
+
+            <com.example.myapplication.IntensityChartView
+                android:id="@+id/intensityChart"
+                android:layout_width="match_parent"
+                android:layout_height="125dp"
+                android:layout_marginTop="6dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_shake_card"
+            android:padding="13dp"
+            android:layout_marginTop="13dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CƯỜNG ĐỘ CHUYỂN ĐỘNG"
+                android:textColor="#20345B"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:includeFontPadding="false" />
+
+            <ProgressBar
+                android:id="@+id/progressIntensity"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:max="100"
+                android:progress="0"
+                android:progressTint="#3478F6"
+                android:progressBackgroundTint="#E2E9F5"
+                android:layout_marginTop="11dp" />
+
+            <TextView
+                android:id="@+id/tvIntensity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cường độ: Chưa có"
+                android:textColor="#3478F6"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:layout_marginTop="9dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chưa bắt đầu"
+            android:textColor="#78869D"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="9dp" />
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="BẮT ĐẦU"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:backgroundTint="#3478F6"
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
+
+        <Button
+            android:id="@+id/btnReset"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="RESET"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:backgroundTint="#F39B36"
+            android:layout_marginTop="7dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
+
+    </LinearLayout>
+
+</ScrollView>
