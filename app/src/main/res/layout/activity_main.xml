@@ -1,61 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:background="#000000"
-    android:paddingTop="32dp"
-    android:paddingBottom="16dp">
+    android:paddingStart="18dp"
+    android:paddingEnd="18dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="48dp">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="LA BÀN"
+        android:text="COMPASS"
         android:textColor="#FFFFFF"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:includeFontPadding="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="LA BÀN ĐỊNH HƯỚNG"
+        android:textColor="#8E8E93"
+        android:textSize="12sp"
+        android:letterSpacing="0.15"
+        android:gravity="center"
+        android:layout_marginTop="6dp" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center">
-
+        android:gravity="center"
+        android:padding="4dp">
 
         <com.example.myapplication.CompassDialView
             android:id="@+id/compassDial"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-
-
     </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:layout_height="115dp"
         android:orientation="horizontal"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:layout_marginBottom="36dp">
-
-        <TextView
-            android:id="@+id/tvGoc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0°"
-            android:textColor="#FFFFFF"
-            android:textSize="88sp"
-            android:fontFamily="sans-serif-thin" />
+        android:gravity="center"
+        android:background="@drawable/bg_compass_card"
+        android:padding="16dp">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="14dp">
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GÓC PHƯƠNG VỊ"
+                android:textColor="#8E8E93"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvGoc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0°"
+                android:textColor="#FFFFFF"
+                android:textSize="52sp"
+                android:fontFamily="sans-serif-light"
+                android:includeFontPadding="false"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="70dp"
+            android:background="#38383A" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HƯỚNG HIỆN TẠI"
+                android:textColor="#8E8E93"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvHuong"
@@ -63,16 +106,24 @@
                 android:layout_height="wrap_content"
                 android:text="Hướng Bắc"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bắc từ"
-                android:textColor="#AAAAAA"
-                android:textSize="16sp" />
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:layout_marginTop="9dp" />
 
         </LinearLayout>
+
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xoay điện thoại để xác định phương hướng"
+        android:textColor="#8E8E93"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="8dp" />
 
 </LinearLayout>
